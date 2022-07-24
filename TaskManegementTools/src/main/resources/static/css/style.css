@@ -1,0 +1,16 @@
+.header {
+	padding-bottom: 0.7rem;
+	margin-bottom: 1.5rem;
+}
+
+button {
+	display: inline-block; /*コレ*/
+}
+
+.buttons {
+	text-align: left;
+}
+
+.form-group {
+	display: inline; /*コレ*/
+}

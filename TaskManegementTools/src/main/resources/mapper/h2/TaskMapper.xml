@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapperとxmlのマッピング -->
+<mapper namespace="com.example.demo.repository.TaskMapper">
+
+<!-- マッピング定義(タスク) -->
+	<resultMap type="Task" id="task">
+		<id column="id" property="id" />
+		<result column="kind_id" property="kindId" />
+		<result column="name" property="name" />
+		<result column="entry_date" property="entryDate" />
+		<result column="complete_date" property="completeDate" />
+		<result column="condition_id" property="conditionId" />
+		<association property="kind" resultMap="kind" />
+		<association property="condition" resultMap="condition" />
+		<collection property="updateLogList" resultMap="updateLog" columnPrefix="log_"/>
+	</resultMap>
+
+<!-- マッピング定義(更新ログ種別) -->
+	<resultMap type="UpdateLog" id="updateLog">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="condition_id" property="conditionId" />
+		<result column="condition" property="condition" />
+		<result column="update_date" property="updateDate" />
+		<result column="memo" property="memo"/>
+	</resultMap>
+
+<!-- マッピング定義(タスク種別) -->
+	<resultMap type="Kind" id="kind">
+		<id column="kind_id" property="kindId"/>
+		<result column="kind" property="kind" />
+	</resultMap>
+
+<!-- マッピング定義(タスクの状態) -->
+	<resultMap type="Condition" id="condition">
+		<id column="condition_id" property="conditionId"/>
+		<result column="condition" property="condition" />
+	</resultMap>
+
+	<!-- ユーザー全件取得 -->
+	<select id="findAll_OLD" resultType="Task">
+		select
+			*
+		from
+		tasks
+	</select>
+
+	<select id="findAll" resultMap="task">
+		select
+			tasks.id
+			, kinds.kind
+			, tasks.name
+			, tasks.entry_date
+			, tasks.complete_date
+			, conditions.condition
+		from
+		tasks
+		left join kinds
+		  on tasks.kind_id = kinds.kind_id
+		left join conditions
+		  on tasks.condition_id = conditions.condition_id
+
+	</select>
+
+
+	<!-- ユーザー1件取得 -->
+	<select id="find_OLD" resultType="Task">
+		select
+			*
+		from
+			tasks
+		where
+			id = #{id}
+	</select>
+
+	<select id="find" resultMap="task">
+		select
+			tasks.id
+			, kinds.kind_id
+			, kinds.kind
+			, tasks.name
+			, tasks.entry_date
+			, tasks.complete_date
+			, conditions.condition_id
+			, conditions.condition
+			, logs.name as log_name
+			<!--, logs.condition_id as log_condition_id -->
+			, (select
+				condition
+			from
+				conditions
+			where
+				conditions.condition_id = logs.condition_id
+			) as log_condition
+			, logs.update_date as log_update_date
+			, logs.memo as log_memo
+
+		from
+		tasks
+		left join kinds
+		  on tasks.kind_id = kinds.kind_id
+		left join conditions
+		  on tasks.condition_id = conditions.condition_id
+		left join logs
+			on tasks.id = logs.id
+		where
+			tasks.id = #{id}
+	</select>
+
+	<!-- タスク1件登録 -->
+	<insert id="insert" parameterType="Task" >
+		insert into tasks (
+			kind_id
+			, name
+			, entry_date
+			, condition_id
+
+		) values (
+			#{kindId}
+			, #{name}
+			, #{entryDate}
+			, #{conditionId}
+		)
+	</insert>
+
+	<!-- 更新履歴1件登録 -->
+	<insert id="insertLog" parameterType="Task" >
+		insert into logs (
+			id
+			, name
+			, condition_id
+			, update_date
+			, memo
+		) values (
+			#{id}
+			, #{name}
+			, #{condition.conditionId}
+			, #{completeDate}
+			, #{memo}
+		)
+	</insert>
+
+	<!-- タスク1件更新 -->
+	<update id="update" parameterType="Task">
+		update
+			tasks
+		SET
+			name = #{name},
+			complete_date = #{completeDate},
+			condition_id = #{conditionId}
+		where
+			id = #{id}
+	</update>
+
+	<!-- タスク1件削除 -->
+	<delete id="delete">
+	delete from
+		tasks
+	where
+		id = #{id}
+	</delete>
+
+	<!-- 状態一覧取得 -->
+	<select id="getConditions" resultType="Condition">
+		select
+			*
+		from
+			conditions
+	</select>
+
+	<!-- 状態１件取得 -->
+	<select id="getCondition" resultType="Condition">
+		select
+			*
+		from
+			conditions
+		where
+			conditions.condition_id = #{id}
+	</select>
+
+
+	<!-- 種別一覧取得 -->
+	<select id="getKinds" resultType="Kind">
+		select
+			*
+		from
+			kinds
+	</select>
+
+	<!-- 更新履歴取得 -->
+	<select id="updateLogs" resultType="UpdateLog">
+		select
+			*
+		from
+			logs
+	</select>
+
+
+
+</mapper>

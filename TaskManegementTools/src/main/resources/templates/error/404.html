@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/layout :: layout(~{::title}, ~{::body})}">
+<head>
+<title>Insert title here</title>
+</head>
+<body>
+	<h1 th:text="${status}">エラーだよー</h1>
+	<p>４０４専用エラー画面だっちゅ～の</p>
+	<p th:text="${error}">エラー概要だにょ</p>
+	<p>ログイン画面にもどれや</p>
+	<form method="get" th:action="@{/}">
+		<button class="btn btn-link" type="submit">もどれやしかし</button>
+	</form>
+
+</body>
+</html>

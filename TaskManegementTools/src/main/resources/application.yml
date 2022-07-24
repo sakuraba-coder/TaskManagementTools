@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:taskdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  # テーブル自動作成
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+  h2.console.enabled: true
+#message
+  messages:
+    basename: i18n/messages,i18n/ValidationMessages
+  
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/h2/*.xml
+  type-aliases-package: com.example.demo.domain.model
+
+
